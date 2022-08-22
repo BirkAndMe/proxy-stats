@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title></title>
+  <script src="ProxyStats.js"></script>
+</head>
+
+<body>
+  <script>
+function slowFunction(min, max) {
+  const end = Date.now() + Math.round(min + Math.random() * (max - min));
+  while (Date.now() < end) { }
+}
+
+class ExampleClass {
+  aProperty = 'some property'
+
+  get aGetter() {
+    slowFunction(50, 50);
+    return 'some getter';
+  }
+
+  set aGetter($value) {
+    slowFunction(50, 50);
+  }
+
+  aFunction() {
+    slowFunction(50, 50);
+  }
+}
+
+const exampleObject = ProxyStats.watch(new ExampleClass());
+exampleObject.aProperty;
+exampleObject.aGetter;
+exampleObject.aGetter;
+exampleObject.aGetter = '';
+exampleObject.aFunction();
+exampleObject.aFunction();
+  </script>
+</body>
+
+</html>
+
