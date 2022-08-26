@@ -6,7 +6,6 @@ class ProxyStats {
 
   static watch(target) {
     const proxyStats = new ProxyStats();
-    console.log(proxyStats);
     return proxyStats.watch(target);
   }
 
