@@ -37,11 +37,11 @@ class ProxyStats {
 
   handleFunction(target, property, receiver) {
     const me = this;
-    const timeKey = this.getTimeKey(target, property) + '()';
 
-    this.time(timeKey);
     return new Proxy(target[property], {
       apply(fnTarget, thisArg, args) {
+        const timeKey = me.getTimeKey(target, property) + '()';
+        me.time(timeKey);
         const result = Reflect.apply(fnTarget, thisArg, args);
         me.timeEnd(timeKey);
 
