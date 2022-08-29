@@ -35,7 +35,26 @@ class ProxyStats {
     this.stats[key].count += 1;
   }
 
+  handleFunction(target, property, receiver) {
+    const me = this;
+    const timeKey = this.getTimeKey(target, property) + '()';
+
+    this.time(timeKey);
+    return new Proxy(target[property], {
+      apply(fnTarget, thisArg, args) {
+        const result = Reflect.apply(fnTarget, thisArg, args);
+        me.timeEnd(timeKey);
+
+        return result;
+      }
+    });
+  }
+
   get(target, property, receiver) {
+    if (typeof target[property] === 'function') {
+      return this.handleFunction(target, property, receiver);
+    }
+
     const timeKey = 'get ' + this.getTimeKey(target, property);
 
     this.time(timeKey);
