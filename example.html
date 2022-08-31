@@ -28,6 +28,15 @@ class ExampleClass {
   aFunction() {
     slowFunction(50, 50);
   }
+
+  aRecursiveFunction(depth) {
+    if (depth-- === 0) {
+      return;
+    }
+
+    slowFunction(50, 50);
+    this.aRecursiveFunction(depth);
+  }
 }
 
 const exampleObject = ProxyStats.watch(new ExampleClass());
@@ -37,6 +46,7 @@ exampleObject.aGetter;
 exampleObject.aGetter = '';
 exampleObject.aFunction();
 exampleObject.aFunction();
+exampleObject.aRecursiveFunction(2);
   </script>
 </body>
 
