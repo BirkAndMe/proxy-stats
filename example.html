@@ -30,12 +30,11 @@ class ExampleClass {
   }
 
   aRecursiveFunction(depth) {
-    if (depth-- === 0) {
-      return;
-    }
-
     slowFunction(50, 50);
-    this.aRecursiveFunction(depth);
+
+    if (--depth > 0) {
+      this.aRecursiveFunction(depth);
+    }
   }
 }
 
