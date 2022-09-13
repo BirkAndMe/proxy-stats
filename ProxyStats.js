@@ -18,16 +18,20 @@ class ProxyStats {
   }
 
   time(key) {
-    this._timers[key] = Date.now();
+    this._timers[key] = this._timers[key] || [];
+    this._timers[key].push(Date.now());
   }
 
   timeEnd(key) {
-    const time = Date.now() - this._timers[key];
+    const time = Date.now() - this._timers[key].pop();
 
-    key = key.split(' -- ').shift();
-    this.updateStats(key, time);
-
-    console.log(key, `${time} ms (${this.stats[key].time} ms -- ${this.stats[key].count})`);
+    if (this._timers[key].length === 0) {
+      this.updateStats(key, time);
+      console.log(key, `${time} ms (${this.stats[key].time} ms -- ${this.stats[key].count})`);
+    } else {
+      this.updateStats(key, 0);
+      console.log(key, `${time} ms (${this.stats[key].time + time} ms -- ${this.stats[key].count})`);
+    }
   }
 
   updateStats(key, time) {
@@ -42,7 +46,7 @@ class ProxyStats {
 
     return new Proxy(target[property], {
       apply(fnTarget, thisArg, args) {
-        const timeKey = me.getTimeKey(target, property) + '() -- ' + Math.random().toString(36).substring(2);
+        const timeKey = me.getTimeKey(target, property) + '()';
         me.time(timeKey);
         const result = Reflect.apply(fnTarget, thisArg, args);
         me.timeEnd(timeKey);
