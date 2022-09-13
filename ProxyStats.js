@@ -13,13 +13,11 @@ class ProxyStats {
     return new Proxy(target, this)
   }
 
-  getTimeKey(target, property) {
-    return `${target.constructor.name}.${property}`;
-  }
-
   time(key) {
     this._timers[key] = this._timers[key] || [];
     this._timers[key].push(Date.now());
+
+    return key;
   }
 
   timeEnd(key) {
@@ -46,8 +44,7 @@ class ProxyStats {
 
     return new Proxy(target[property], {
       apply(fnTarget, thisArg, args) {
-        const timeKey = me.getTimeKey(target, property) + '()';
-        me.time(timeKey);
+        const timeKey = me.time(`${target.constructor.name}.${property}()`);
         const result = Reflect.apply(fnTarget, thisArg, args);
         me.timeEnd(timeKey);
 
@@ -61,9 +58,7 @@ class ProxyStats {
       return this.handleFunction(target, property, receiver);
     }
 
-    const timeKey = 'get ' + this.getTimeKey(target, property);
-
-    this.time(timeKey);
+    const timeKey = this.time(`get ${target.constructor.name}.${property}`);
     const result = Reflect.get(target, property, receiver);
     this.timeEnd(timeKey);
 
@@ -71,9 +66,7 @@ class ProxyStats {
   }
 
   set(target, property, value, receiver) {
-    const timeKey = 'set ' + this.getTimeKey(target, property);
-
-    this.time(timeKey);
+    const timeKey = this.time(`set ${target.constructor.name}.${property}`);
     Reflect.set(target, property, value, receiver);
     this.timeEnd(timeKey);
 
