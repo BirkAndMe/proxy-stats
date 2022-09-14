@@ -1,12 +1,19 @@
 class ProxyStats {
+
+  static _instances = {};
+
   constructor() {
     this._timers = {};
     this.stats = {};
   }
 
-  static watch(target) {
-    const proxyStats = new ProxyStats();
-    return proxyStats.watch(target);
+  static watch(target, name) {
+    if (name === undefined) {
+      return new Proxy(target, new ProxyStats());
+    }
+
+    this._instances[name] = this._instances[name] || new ProxyStats(name);
+    return this._instances[name].watch(target);
   }
 
   watch(target) {
